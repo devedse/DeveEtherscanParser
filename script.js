@@ -105,7 +105,7 @@ class HtmlHelper {
     {
         var stringifiedData = data.methodName + " " + JSON.stringify(data.args);
 
-        let leftColunm = $('<div class="col-sm-3">Extra info:</div>');
+        let leftColunm = $('<div class="col-sm-3">Parsed Input Data: (DeveEtherscanParser)</div>');
         let rightColumn = $('<div class="col-sm-9 cbs"><span title="The binary data that formed the input to the transaction, either the input data if it was a message call or the contract initialisation if it was a contract creation"><textarea readonly="" spellcheck="false" style="width: 98%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="4" id="inputdata">' + stringifiedData + '</textarea><br><span id="rawinput" style="display:none"></span></span></div>')
 
         let foundItem = $('#ContentPlaceHolder1_maintable');
@@ -166,7 +166,7 @@ class Main {
                 });
             }
 
-        }       
+        }
     }
 }
 
@@ -175,7 +175,7 @@ class Main {
  */
 $(document).ready(() =>
                   {
-    console.log('Etherscan Devedse Extension loaded');
+    console.log('DeveEtherscanParser loaded');
     let main = new Main();
 
     $.getJSON("https://api.coinmarketcap.com/v1/ticker/ethereum/", data =>
