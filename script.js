@@ -75,7 +75,7 @@ class TransactionParser {
                                 let curParsed = remainder.substring(0, 64);
 
                                 let result = parseInt(curParsed, 16);
-                                data.args.push({name: curInput.name, value: result});
+                                data.args.push({name: curInput.name, value: result, type: curInput.type});
 
                                 remainder = remainder.substring(64);
                             }
