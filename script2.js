@@ -95,46 +95,102 @@
 
             return new Promise((resolve, reject) => {
 
-                let data = {
-                    methodName: "Couldn't detect method name",
-                    methodDescription: '',
-                    args: []
-                };
+
 
                 if (content.startsWith("0x")) {
+                    var data = self.fill(content, self.abis);
+                    resolve(data);
 
-                    for (let abiNumber = 0; abiNumber < self.abis.length; abiNumber++) {
-                        let abiForApplication = self.abis[abiNumber];
+                } else {
+                    var customAbi = {
+                        "constant": false,
+                        "inputs": [],
+                        "name": "?????",
+                        "outputs": [],
 
-                        const decoder = new InputDataDecoder(abiForApplication);
-                        const result = decoder.decodeData(content);
-                        console.log(result)
-
-                        data.methodName = result.name;
-
-                        for (let i = 0; i < abiForApplication.length; i++) {
-                            let cur = abiForApplication[i];
-
+                        "type": "function",
+                        "signature": "?????"
+                    };
 
 
-                            if (content.startsWith(cur.signature)) {
-                                data.methodName = cur.name;
+                    var splitted = content.split('\n');
 
-                                for (var y = 0; y < cur.inputs.length; y++) {
-                                    let curInput = cur.inputs[y];
-
-                                    data.args.push({name: curInput.name, value: result.inputs[y], type: result.types[y]});
-                                }
-                                break;
-                            }
+                    for (let i = 0; i < splitted.length; i++) {
+                        let curSplit = splitted[i];
+                        if (curSplit.startsWith('MethodID: ')) {
+                            customAbi.signature = curSplit.substring(10);
+                            break;
                         }
                     }
-                } else {
-                    data.methodName = "Already known";
+
+                    for (let i = 0; i < splitted.length; i++) {
+                        let curSplit = splitted[i];
+                        if (curSplit.startsWith('Function: ')) {
+                            let firstSub = curSplit.substring(10);
+                            let firstIndexOfEnd = firstSub.indexOf('(');
+                            customAbi.name = firstSub.substring(0, firstIndexOfEnd);
+
+                            let remainder = firstSub.substring(firstIndexOfEnd + 1, firstSub.length - 1);
+
+                            var splitArguments = remainder.split(',');
+                            for (var y = 0; y < splitArguments.length; y++) {
+                                var curArg = splitArguments[y].trim();
+                                var splittedArg = curArg.split(' ');
+                                customAbi.inputs.push({
+                                    "name": splittedArg[1],
+                                    "type": splittedArg[0]
+                                });
+                            }
+                            break;
+                        }
+                    }
+
+                    var abisTemp = [[customAbi]];
+                    var data = self.fill(content, abisTemp);
+                    resolve(data);
                 }
 
-                resolve(data);
             });
+        }
+
+
+        fill(content, abis) {
+            let data = {
+                methodName: "Couldn't detect method name",
+                methodDescription: '',
+                args: []
+            };
+
+            content = content.trim().replace(/(?:[\s\S]*MethodID: (.*)[\s\S])?[\s\S]?\[\d*\]:(.*)/gi, '$1$2').replace(/\s/g, '');
+
+            for (let abiNumber = 0; abiNumber < abis.length; abiNumber++) {
+                let abiForApplication = abis[abiNumber];
+
+                const decoder = new InputDataDecoder(abiForApplication);
+                const result = decoder.decodeData(content);
+                console.log(result)
+
+                data.methodName = result.name;
+
+                for (let i = 0; i < abiForApplication.length; i++) {
+                    let cur = abiForApplication[i];
+
+
+
+                    if (content.startsWith(cur.signature)) {
+                        data.methodName = cur.name;
+
+                        for (var y = 0; y < cur.inputs.length; y++) {
+                            let curInput = cur.inputs[y];
+
+                            data.args.push({name: curInput.name, value: result.inputs[y], type: result.types[y]});
+                        }
+                        break;
+                    }
+                }
+            }
+
+            return data;
         }
     }
 
@@ -149,7 +205,7 @@
    */
         displayDataForTransactionDetails(data)
         {
-            var stringifiedData = data.methodName + " " + JSON.stringify(data.args);
+            var stringifiedData = data.methodName + " " + JSON.stringify(data.args, null, "\t");
 
             let leftColunm = $('<div class="col-sm-3">Parsed Input Data: (DeveEtherscanParser2)</div>');
             let rightColumn = $('<div class="col-sm-9 cbs"><span title="The binary data that formed the input to the transaction, either the input data if it was a message call or the contract initialisation if it was a contract creation"><textarea readonly="" spellcheck="false" style="width: 98%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="4" id="inputdata">' + stringifiedData + '</textarea><br><span id="rawinput" style="display:none"></span></span></div>')
@@ -29089,7 +29145,3 @@ function convert(value, fromUnit, toUnit) {
     module.exports = uuid;
 
 },{"./rng":158}]},{},[1]);
-
-
-
-
