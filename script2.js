@@ -183,7 +183,16 @@
                         for (var y = 0; y < cur.inputs.length; y++) {
                             let curInput = cur.inputs[y];
 
-                            data.args.push({name: curInput.name, value: result.inputs[y], type: result.types[y]});
+                            let argsToAdd = {
+                                name: curInput.name,
+                                type: result.types[y],
+                                value: result.inputs[y]
+                            };
+
+                            if (argsToAdd.type.startsWith("uint") || argsToAdd.type.startsWith("int")) {
+                                argsToAdd.valueAsInt = argsToAdd.value.toString(10);
+                            }
+                            data.args.push(argsToAdd);
                         }
                         break;
                     }
