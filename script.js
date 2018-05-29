@@ -214,10 +214,19 @@
    */
         displayDataForTransactionDetails(data)
         {
+            var leftEl = document.getElementById("etherscanparseleft");
+            var rightEl = document.getElementById("etherscanparseright");
+            if (leftEl) {
+                leftEl.parentNode.removeChild(leftEl);
+            }
+            if (rightEl) {
+                rightEl.parentNode.removeChild(rightEl);
+            }
+
             var stringifiedData = data.methodName + " " + JSON.stringify(data.args, null, "\t");
 
-            let leftColunm = $('<div class="col-sm-3">Parsed Input Data: (DeveEtherscanParser)</div>');
-            let rightColumn = $('<div class="col-sm-9 cbs"><span title="The binary data that formed the input to the transaction, either the input data if it was a message call or the contract initialisation if it was a contract creation"><textarea readonly="" spellcheck="false" style="width: 98%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="10" id="inputdata">' + stringifiedData + '</textarea><br><span id="rawinput" style="display:none"></span></span></div>')
+            let leftColunm = $('<div id="etherscanparseleft" class="col-sm-3">Parsed Input Data: (DeveEtherscanParser)</div>');
+            let rightColumn = $('<div id="etherscanparseright" class="col-sm-9 cbs"><span title="The binary data that formed the input to the transaction, either the input data if it was a message call or the contract initialisation if it was a contract creation"><textarea readonly="" spellcheck="false" style="width: 98%; font-size: small; font-family: Monospace; padding: 8px; background-color: #EEEEEE;" rows="10" id="inputdata">' + stringifiedData + '</textarea><br><span id="rawinput" style="display:none"></span></span></div>')
 
             let foundItem = $('#ContentPlaceHolder1_maintable');
             foundItem.append(leftColunm);
